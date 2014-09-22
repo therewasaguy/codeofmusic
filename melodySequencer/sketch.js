@@ -31,6 +31,8 @@ function setup() {
 
 var step = 0;
 function increment() {
+  step++;
+  console.log(step%wDiv);
   for (var i in blocks) {
     var stepColumn = map( (step%wDiv), 0, wDiv, 0, width);
     if (blocks[i].x === stepColumn) {
@@ -41,16 +43,15 @@ function increment() {
       blocks[i].c[2] = 0;
     }
   }
-  step++;
 }
 
-function playNote(n, t) {
+function playNote(n) {
   var osc = oscillators[current % (oscillators.length- 1)];
   var env = envelopes[current % (envelopes.length - 1)];
   // osc.stop(); // stop oscillator in case it has been started
   osc.freq(midiToFreq(n));
   // env.set(0.01, 0.8, n.duration, 0.2);
-  env.play(osc, t);
+  env.play(osc);
   current++;
 }
 
