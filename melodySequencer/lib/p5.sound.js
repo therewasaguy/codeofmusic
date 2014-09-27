@@ -2152,7 +2152,12 @@ Tone_signal_Signal = function (Tone) {
     } else {
       value *= this._syncRatio;
     }
-    this._scalar.gain.value = value;
+    if (!isNaN(value)) {
+      this._scalar.gain.value = value;
+    } else {
+      this._scalar.gain.value = 0;
+      //throw 'setValue error: ' + value + ' is not a number!';
+    }
   };
   Tone.Signal.prototype.setValueAtTime = function (value, time) {
     value *= this._syncRatio;

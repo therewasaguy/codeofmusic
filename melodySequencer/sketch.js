@@ -32,7 +32,6 @@ function setup() {
 var step = 0;
 function increment() {
   step++;
-  console.log(step%wDiv);
   for (var i in blocks) {
     var stepColumn = map( (step%wDiv), 0, wDiv, 0, width);
     if (blocks[i].x === stepColumn) {
@@ -51,6 +50,9 @@ function playNote(n) {
   // osc.stop(); // stop oscillator in case it has been started
   osc.freq(midiToFreq(n));
   // env.set(0.01, 0.8, n.duration, 0.2);
+  // osc.amp(1);
+  // osc.connect();
+
   env.play(osc);
   current++;
 }
