@@ -1,13 +1,4 @@
-// array of oscillators and envelopes
-var oscillators = [];
-var envelopes = [];
-var current = 0; // array position of the oscillator/env
-
 // drums
-// var kick = new Tone.FMSynth();
-// kick.setPreset('myKick');
-// var snare = new Tone.FMSynth();
-// snare.setPreset('mySnare');
 var kick = new Tone.Sampler('audio/kick.mp3');
 var snare = new Tone.Sampler('audio/snare.mp3');
 var hh = new Tone.Sampler('audio/hh.mp3');

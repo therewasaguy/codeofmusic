@@ -26,17 +26,8 @@ sequencerObject.hho = hho;
 
 // console.log(sequencerObject);
 
-app.get('/', function(req, res){
-	var options = {
-		root: __dirname + '/public/',
-		dotfiles: 'deny',
-		headers: {
-			'x-timestamp': Date.now(),
-			'x-sent': true
-		}
-	};
-
-	res.sendFile('index.html', options);
+app.use(function (req, res, err) {
+	res.sendFile('index.html', { root: __dirname + '/public' });
 });
 
 http.listen(3000, function(){
