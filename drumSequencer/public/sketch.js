@@ -17,8 +17,10 @@ for (var i in drumArray) {
   drumArray[i].toMaster();
 }
 
+// var socket = new io();
+
 // io.sockets.on('init Sequencer', function(data) {
-//   data.
+//   console.log(data);
 // });
 
 // how many blocks fit horizontally and vertically:
@@ -28,8 +30,69 @@ var wDiv = 16;
 // array of Blocks
 var blocks = [];
 
+// ==================
+// DRUM PATTERN STUFF
+// ==================
+var kickArray = new Array(wDiv);
+var snareArray = new Array(wDiv);
+var hhArray = new Array(wDiv);
+var hhoArray = new Array(wDiv);
+var drumPatterns = [kickArray, snareArray, hhArray, hhoArray];
+
+// set all the drums to 0 empty to start
+function clearBlocks() {
+  for (var i in drumPatterns) {
+    for (var j = 0; j < wDiv; j++) {
+      drumPatterns[i][j] = false;
+    }
+  }
+  blocks = [];
+}
+
+function parseSeqObj(data) {
+  clearBlocks();
+  kickArray = data.kick;
+  snareArray = data.snare;
+  hhArray = data.hh;
+  hhoArray = data.hho;
+  drumPatterns = [kickArray, snareArray, hhArray, hhoArray];
+  for (var i in drumPatterns) {
+    for (var j = 0; j < wDiv; j++) {
+      if (drumPatterns[i][j] === true) {
+        console.log(i, j);
+        var bX = width/wDiv * j;
+        var bY = height/hDiv * i;
+        blocks.push( new Block(bX, bY));
+      };
+    }
+  }
+}
+
+// test data
+var sequencerObject = {};
+sequencerObject.snare = [];
+sequencerObject.kick = [];
+sequencerObject.hh = [];
+sequencerObject.hho = [];
+
+for ( var i = 0; i < 16; i++ ){
+  if (Math.random() > .5 )  sequencerObject.snare.push(true);
+    else          sequencerObject.snare.push(false);
+  if (Math.random() > .5 )  sequencerObject.kick.push(true);
+    else          sequencerObject.kick.push(false);
+  if (Math.random() > .5 )  sequencerObject.hh.push(true);
+    else          sequencerObject.hh.push(false);
+  if (Math.random() > .5 )  sequencerObject.hho.push(true);
+    else          sequencerObject.hho.push(false);    
+}
+
+
+
 function setup() {
   createCanvas(800, 400);
+
+  // set up blocks
+  parseSeqObj(sequencerObject);
 
   // make the synths and envelopes
   for (var i = 0; i <= 8; i++) {
@@ -79,6 +142,7 @@ function mousePressed() {
     if (blocks[i].isTouching(mouseX, mouseY) ) {
       pressedX = blocks[i].x;
       pressedY = blocks[i].y;
+      blocks[i].remove();
       blocks.splice(i, 1);
     }
   }
@@ -119,6 +183,11 @@ var Block = function(x, y) {
   this.w = width/wDiv;
   this.h = height/hDiv;
   this.c = [255, 255, 255];
+
+  // update drumPattern array
+  var whichDrum = Math.round( map(this.y, 0, height, hDiv, 0) ) - 1;
+  var whichStep = Math.round(map(this.x, 0, width, 0, wDiv));
+  drumPatterns[whichDrum][whichStep] = true;
 }
 
 Block.prototype.update = function() {
@@ -135,4 +204,11 @@ Block.prototype.isTouching = function(x, y) {
   else {
     return false;
   }
+}
+
+Block.prototype.remove = function() {
+  // update drumPattern array to zero
+  var whichDrum = Math.round( map(this.y, 0, height, hDiv, 0) ) - 1;
+  var whichStep = Math.round(map(this.x, 0, width, 0, wDiv));
+  drumPatterns[whichDrum][whichStep] = false;
 }
