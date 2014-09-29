@@ -4,18 +4,26 @@ var envelopes = [];
 var current = 0; // array position of the oscillator/env
 
 // drums
-var kick = new Tone.Player('audio/kick.mp3');
-var snare = new Tone.Player('audio/snare.mp3');
-var hh = new Tone.Player('audio/hh.mp3');
-var hho =new Tone.Player('audio/hho.mp3');
+// var kick = new Tone.FMSynth();
+// kick.setPreset('myKick');
+// var snare = new Tone.FMSynth();
+// snare.setPreset('mySnare');
+var kick = new Tone.Sampler('audio/kick.mp3');
+var snare = new Tone.Sampler('audio/snare.mp3');
+var hh = new Tone.Sampler('audio/hh.mp3');
+var hho =new Tone.Sampler('audio/hho.mp3');
 var drumArray = [kick, snare, hh, hho];
 for (var i in drumArray) {
   drumArray[i].toMaster();
 }
 
+// io.sockets.on('init Sequencer', function(data) {
+//   data.
+// });
+
 // how many blocks fit horizontally and vertically:
 var hDiv = drumArray.length;
-var wDiv = 8;
+var wDiv = 16;
 
 // array of Blocks
 var blocks = [];
@@ -43,7 +51,7 @@ function increment(time) {
     var stepColumn = map( (step%wDiv), 0, wDiv, 0, width);
     if (blocks[i].x === stepColumn) {
       var whichDrum = Math.round( map(blocks[i].y, 0, height, hDiv, 0) ) - 1;
-      playDrum(whichDrum, time); //
+      playDrum(whichDrum, time);
       blocks[i].c[1] = 0;
       blocks[i].c[2] = 0;
     }
@@ -51,7 +59,7 @@ function increment(time) {
 }
 
 function playDrum(whichDrum, time) {
-  drumArray[whichDrum].start(time);
+  drumArray[whichDrum].triggerAttackRelease(1, time);
   current++;
 }
 
