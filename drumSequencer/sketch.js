@@ -59,7 +59,7 @@ function parseSeqObj(data) {
   for (var i in drumPatterns) {
     for (var j = 0; j < wDiv; j++) {
       if (drumPatterns[i][j] === true) {
-        console.log(i, j);
+        console.log(drumPatterns[i],j);
         var bX = width/wDiv * j;
         var bY = height/hDiv * i;
         blocks.push( new Block(bX, bY));
@@ -86,13 +86,24 @@ for ( var i = 0; i < 16; i++ ){
     else          sequencerObject.hho.push(false);    
 }
 
+function savePattern() {
+  var obj = {};
+  obj.snare = snareArray;
+  obj.kick = kickArray;
+  obj.hh = hhArray;
+  obj.hho = hhoArray;
+  saveJSON(obj);
+}
 
+function loadPattern() {
+  loadJSON('patterns/2.json', parseSeqObj);
+}
 
 function setup() {
   createCanvas(800, 400);
 
   // set up blocks
-  parseSeqObj(sequencerObject);
+  // parseSeqObj(sequencerObject);
 
   // make the synths and envelopes
   for (var i = 0; i <= 8; i++) {
