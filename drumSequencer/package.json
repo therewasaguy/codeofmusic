@@ -10,9 +10,10 @@
   "author": "jason sigal and jeff ong",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "tone" : "*",
-    "p5" : "*",
-    "require" : "*",
-    "socket.io" : "*"
+    "tone": "*",
+    "p5": "*",
+    "require": "*",
+    "socket.io": "~1.1.0",
+    "express": "~4.9.5"
   }
 }
