@@ -1,9 +1,10 @@
+var bpm = 90;
 var current = 0;
 // drums
 var kick = new Tone.Sampler('audio/kick.mp3');
 var snare = new Tone.Sampler('audio/snare.mp3');
 var hh = new Tone.Sampler('audio/hh.mp3');
-var hho =new Tone.Sampler('audio/hho.mp3');
+var hho =new Tone.Sampler('audio/agogoHigh.mp3');
 var drumArray = [kick, snare, hh, hho];
 for (var i in drumArray) {
   drumArray[i].toMaster();
@@ -11,8 +12,8 @@ for (var i in drumArray) {
 
 var socket = io();
 
-socket.on('init sequencer', function(data) {
-  // parseSeqObj(data);
+socket.on('initSequencer', function(data) {
+  parseSeqObj(data);
   console.log(data);
 });
 
@@ -23,9 +24,9 @@ var wDiv = 16;
 // array of Blocks
 var blocks = [];
 
-// ==================
-// DRUM PATTERN STUFF
-// ==================
+// ===========================
+// Drum Pattern Array for i/o
+// ===========================
 var kickArray = new Array(wDiv);
 var snareArray = new Array(wDiv);
 var hhArray = new Array(wDiv);
@@ -47,6 +48,7 @@ function parseSeqObj(data) {
   clearBlocks();
   drumPatterns = data;
   for (var i in drumPatterns) {
+    console.log('doin it');
     for (var j = 0; j < wDiv; j++) {
       if (drumPatterns[i][j] === true) {
         var bX = width/wDiv * j;
@@ -58,37 +60,95 @@ function parseSeqObj(data) {
 }
 
 function savePattern() {
-  var obj = {};
-  obj.snare = snareArray;
-  obj.kick = kickArray;
-  obj.hh = hhArray;
-  obj.hho = hhoArray;
-  saveJSON(obj);
-}
-
-function loadPattern() {
-  loadJSON('patterns/2.json', parseSeqObj);
+  saveJSON(drumPatterns, 'myPattern.json');
 }
 
 function setup() {
   createCanvas(800, 400);
 
-  // set up blocks
-  // parseSeqObj(sequencerObject);
-
-  // make the synths and envelopes
-  for (var i = 0; i <= 8; i++) {
-    // oscillators.push( new p5.Oscillator() );
-    // envelopes.push( new p5.Env(0.005, 0.65, 0.5, 0.2) );
-  }
-
+  // set up tone transport
   Tone.Transport.setInterval(function(time){
     increment(time);
   }, "16n");
   Tone.Transport.start();
-  Tone.Transport.setBpm(90);
-}
+  Tone.Transport.setBpm(bpm);
 
+  // ============ 
+  // UI w/ p5.dom
+  // ============
+  createP('');
+  var volumeSlider = createSlider();
+  var vol = createP('Volume');
+  volumeSlider.mouseMoved( function() {
+    Tone.Master.setVolume( map(volumeSlider.value(), 0, 100, -80, 1));
+  });
+  volumeSlider.value(100);
+
+  var clear = createButton('clear');
+  clear.mousePressed( function() {
+    clearBlocks();
+  });
+  var save = createButton('save');
+  save.mousePressed( function() {
+    savePattern();
+  });
+
+  var tempoSlider = createSlider();
+  tempoSlider.mouseMoved( function() {
+    Tone.Transport.setBpm( map(tempoSlider.value(), 0, 100, 40, 200));
+  });
+  tempoSlider.value(map(bpm, 40, 200, 0, 100));
+
+
+  // ==================
+  // Import Saved Files
+  // ==================
+  var dropZone = createDiv('Drop files here');
+  dropZone.id('drop_zone');
+  // Add some events
+  dropZone.elt.addEventListener('dragover', handleDragOver, false);
+  dropZone.elt.addEventListener('drop', handleFileSelect, false);
+  dropZone.elt.addEventListener('dragleave', handleDragLeave, false);
+  
+  // When you drag a file on top
+  function handleDragOver(evt) {
+    // Stop the default browser behavior
+    evt.stopPropagation();
+    evt.preventDefault();
+    dropZone.style('background','#fff000');
+  }
+  
+  // If the mosue leaves
+  function handleDragLeave(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    dropZone.style('background','#fff');
+  }
+  
+  // If you drop the file
+  function handleFileSelect(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    dropZone.style('background','');
+
+    // A FileList
+    var files = evt.dataTransfer.files;
+    // Show some properties
+    for (var i = 0, f; f = files[i]; i++) {
+      // Read the file and process the result
+      var reader = new FileReader();
+      reader.readAsText(f);
+      reader.onload = function(e) {
+        parseSeqObj(JSON.parse(e.target.result));
+        sendDrumPattern();
+      }
+    }
+  }
+} // end setup
+
+// ========================
+// keep time and play drums
+// ========================
 var step = 0;
 function increment(time) {
   step++;
@@ -108,8 +168,22 @@ function playDrum(whichDrum, time) {
   current++;
 }
 
+// ==========================
+// draw and mouse interaction
+// ==========================
 function draw() {
   background(0);
+
+  // draw four boxes
+  fill(20);
+  rect(0, 0, width/4, height);
+  fill(40);
+  rect(width/4, 0, width/4, height);
+  fill(20);
+  rect(width/4 * 2, 0, width/4, height);
+  fill(40);
+  rect(width/4 * 3, 0, width/4, height);
+
   for (var i in blocks) {
     blocks[i].update();
   }
@@ -162,6 +236,9 @@ function mouseReleased() {
   sendDrumPattern();
 }
 
+// ============
+// Block class
+// ============
 var Block = function(x, y) {
   this.x = x;
   this.y = y;

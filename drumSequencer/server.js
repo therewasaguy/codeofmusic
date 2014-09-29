@@ -29,13 +29,15 @@ sequencerObject[0] = hho;
 
 // console.log(sequencerObject);
 
-app.use(express.static('public/'));
+app.use(express.static(__dirname + '/public'));
 
 app.get('/', function(req, res, err) {
 	res.sendFile('index.html', { root: __dirname + '/public' });
 });
 
-http.listen(3000, function(){
+app.set('port', (process.env.PORT || 3000))
+
+http.listen(app.get('port'), function(){
   console.log('listening on *:3000');
 });
 
@@ -44,13 +46,13 @@ http.listen(3000, function(){
 io.sockets.on('connection', 
 	// We are given a websocket object in our function
 	function (socket) {
-	
 		console.log("We have a new client: " + socket.id);
 
-		socket.emit('init sequencer', sequencerObject);
+		socket.emit('initSequencer', sequencerObject);
 
 		socket.on('changedPattern', function(data) {
 			console.log('changed pattern!');
+			sequencerObject = data;
 			socket.broadcast.emit('updateSeq', data);
 		});
 
