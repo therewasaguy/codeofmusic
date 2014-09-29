@@ -1,7 +1,9 @@
 // HTTP Portion
+var express = require('express');
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+
 var sequencerObject = {};
 
 var snare = [], kick = [], hh = [], hho = [];
@@ -26,7 +28,9 @@ sequencerObject.hho = hho;
 
 // console.log(sequencerObject);
 
-app.use(function (req, res, err) {
+app.use(express.static('public/'));
+
+app.get('/', function(req, res, err) {
 	res.sendFile('index.html', { root: __dirname + '/public' });
 });
 

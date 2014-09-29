@@ -1,3 +1,4 @@
+var current = 0;
 // drums
 var kick = new Tone.Sampler('audio/kick.mp3');
 var snare = new Tone.Sampler('audio/snare.mp3');
