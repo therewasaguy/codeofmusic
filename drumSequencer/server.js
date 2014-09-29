@@ -12,19 +12,20 @@ var tempo = 98;
 
 for ( var i = 0; i < 16; i++ ){
 	if (Math.random() > .5 ) 	snare.push(true);
-		else 					snare.push(false);
+		else 					snare.push(null);
 	if (Math.random() > .5 ) 	kick.push(true);
-		else 					kick.push(false);
+		else 					kick.push(null);
 	if (Math.random() > .5 ) 	hh.push(true);
-		else 					hh.push(false);
+		else 					hh.push(null);
 	if (Math.random() > .5 ) 	hho.push(true);
-		else 					hho.push(false);		
+		else 					hho.push(null);		
 }
 
-sequencerObject.snare = snare;
-sequencerObject.kick = kick;
-sequencerObject.hh = hh;
-sequencerObject.hho = hho;
+
+sequencerObject[3] = kick;
+sequencerObject[2] = snare;
+sequencerObject[1] = hh;
+sequencerObject[0] = hho;
 
 // console.log(sequencerObject);
 
@@ -46,44 +47,17 @@ io.sockets.on('connection',
 	
 		console.log("We have a new client: " + socket.id);
 
-		socket.broadcast.emit('init sequencer', sequencerObject);
-		
-		// When this user emits, client side: socket.emit('otherevent',some data);
-		socket.on('snare', function(data) {
-			// Data comes in as whatever was sent, including objects
-			console.log("Received: 'change snare' " + data);
-			
-			// Send it to all of the clients
-			socket.broadcast.emit('update sequence', data);
+		socket.emit('init sequencer', sequencerObject);
+
+		socket.on('changedPattern', function(data) {
+			console.log('changed pattern!');
+			socket.broadcast.emit('updateSeq', data);
 		});
 
-		socket.on('kick', function(data) {
-			// Data comes in as whatever was sent, including objects
-			console.log("Received: 'change kick' " + data);
-			
-			// Send it to all of the clients
-			socket.broadcast.emit('update sequence', data);
-		});
-
-		socket.on('hh', function(data) {
-			// Data comes in as whatever was sent, including objects
-			console.log("Received: 'change hh' " + data);
-			
-			// Send it to all of the clients
-			socket.broadcast.emit('update sequence', data);
-		});				
-
-		socket.on('hho', function(data) {
-			// Data comes in as whatever was sent, including objects
-			console.log("Received: 'change hho' " + data);
-			
-			// Send it to all of the clients
-			socket.broadcast.emit('update sequence', data);
-		});
-		
 		socket.on('disconnect', function() {
 			console.log("Client has disconnected " + socket.id);
 		});
+
 	}
 );
 

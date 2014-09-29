@@ -9,11 +9,12 @@ for (var i in drumArray) {
   drumArray[i].toMaster();
 }
 
-// var socket = new io();
+var socket = io();
 
-// io.sockets.on('init Sequencer', function(data) {
-//   console.log(data);
-// });
+socket.on('init sequencer', function(data) {
+  // parseSeqObj(data);
+  console.log(data);
+});
 
 // how many blocks fit horizontally and vertically:
 var hDiv = drumArray.length;
@@ -42,40 +43,18 @@ function clearBlocks() {
 }
 
 function parseSeqObj(data) {
+  console.log(data);
   clearBlocks();
-  kickArray = data.kick;
-  snareArray = data.snare;
-  hhArray = data.hh;
-  hhoArray = data.hho;
-  drumPatterns = [kickArray, snareArray, hhArray, hhoArray];
+  drumPatterns = data;
   for (var i in drumPatterns) {
     for (var j = 0; j < wDiv; j++) {
       if (drumPatterns[i][j] === true) {
-        console.log(drumPatterns[i],j);
         var bX = width/wDiv * j;
-        var bY = height/hDiv * i;
+        var bY = height/hDiv * i; // reverse?
         blocks.push( new Block(bX, bY));
       };
     }
   }
-}
-
-// test data
-var sequencerObject = {};
-sequencerObject.snare = [];
-sequencerObject.kick = [];
-sequencerObject.hh = [];
-sequencerObject.hho = [];
-
-for ( var i = 0; i < 16; i++ ){
-  if (Math.random() > .5 )  sequencerObject.snare.push(true);
-    else          sequencerObject.snare.push(false);
-  if (Math.random() > .5 )  sequencerObject.kick.push(true);
-    else          sequencerObject.kick.push(false);
-  if (Math.random() > .5 )  sequencerObject.hh.push(true);
-    else          sequencerObject.hh.push(false);
-  if (Math.random() > .5 )  sequencerObject.hho.push(true);
-    else          sequencerObject.hho.push(false);    
 }
 
 function savePattern() {
@@ -178,6 +157,9 @@ function mouseReleased() {
   if (bX < width && bX >= 0 && bY < height && bY >= 0) {
     blocks.push( new Block(bX, bY));
   }
+
+  // update socket.io
+  sendDrumPattern();
 }
 
 var Block = function(x, y) {
@@ -188,7 +170,7 @@ var Block = function(x, y) {
   this.c = [255, 255, 255];
 
   // update drumPattern array
-  var whichDrum = Math.round( map(this.y, 0, height, hDiv, 0) ) - 1;
+  var whichDrum = drumArray.length - Math.round( map(this.y, 0, height, hDiv, 0) );
   var whichStep = Math.round(map(this.x, 0, width, 0, wDiv));
   drumPatterns[whichDrum][whichStep] = true;
 }
@@ -211,7 +193,22 @@ Block.prototype.isTouching = function(x, y) {
 
 Block.prototype.remove = function() {
   // update drumPattern array to zero
-  var whichDrum = Math.round( map(this.y, 0, height, hDiv, 0) ) - 1;
+  var whichDrum = drumArray.length - Math.round( map(this.y, 0, height, hDiv, 0) );
   var whichStep = Math.round(map(this.x, 0, width, 0, wDiv));
-  drumPatterns[whichDrum][whichStep] = false;
+  drumPatterns[whichDrum][whichStep] = null;
+
+  // update socket.io
+  sendDrumPattern();
 }
+
+// ============
+// SOCKET STUFF
+// ============
+function sendDrumPattern() {
+  socket.emit('changedPattern', drumPatterns);
+}
+
+socket.on('updateSeq', function (data) {
+  console.log(data);
+  parseSeqObj(data);
+});
