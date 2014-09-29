@@ -80,15 +80,21 @@ function mousePressed() {
 }
 
 function mouseDragged() {
+  var halfBlockWidth = width/wDiv/2;
+  var halfBlockHeight = height/hDiv/2;
+
   pressedX = null;
   pressedY = null;
-  rect(mouseX, mouseY, width/wDiv, height/hDiv);
+  rect(mouseX - halfBlockWidth, mouseY - halfBlockHeight, width/wDiv, height/hDiv);
 }
 
 function mouseReleased() {
   // map block position to grid
-  var bX = Math.round(map(mouseX, 0, width, 0, wDiv))/wDiv * width;
-  var bY = Math.round(map(mouseY, 0, height, 0, hDiv))/hDiv * height;
+
+  var halfBlockWidth = width/wDiv/2;
+  var halfBlockHeight = height/hDiv/2;
+  var bX = Math.round(map(mouseX - halfBlockWidth, 0, width, 0, wDiv))/wDiv * width;
+  var bY = Math.round(map(mouseY - halfBlockHeight, 0, height, 0, hDiv))/hDiv * height;
   // do not re-add block if mouse is in same place
   if (bX === pressedX && bY === pressedY) {
     return;
