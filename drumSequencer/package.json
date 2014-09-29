@@ -1,0 +1,18 @@
+{
+  "name": "drumSequencer",
+  "version": "0.0.0",
+  "description": "a drum sequencer",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "jason sigal and jeff ong",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "tone" : "*",
+    "p5" : "*",
+    "require" : "*",
+    "socket.io" : "*"
+  }
+}
