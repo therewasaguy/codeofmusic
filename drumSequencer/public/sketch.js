@@ -82,7 +82,9 @@ function setup() {
   volumeSlider.mouseMoved( function() {
     Tone.Master.setVolume( map(volumeSlider.value(), 0, 100, -80, 1));
   });
-  volumeSlider.value(100);
+  volumeSlider.value(10);
+  Tone.Master.setVolume( map(volumeSlider.value(), 0, 100, -80, 1));
+
 
   var clear = createButton('clear');
   clear.mousePressed( function() {
