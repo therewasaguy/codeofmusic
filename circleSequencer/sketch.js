@@ -2,6 +2,7 @@ var bpm;
 var beatsPerMeasure;
 var beatLength;
 var ticksPerBeat;
+var ticksPerMeasure;
 
 var clock;
 
@@ -13,10 +14,24 @@ var seqRadius;
 
 var pattern = []
 
+// array of oscillators and envelopes
+var oscillators = [];
+var envelopes = [];
+var current = 0; // array position of the oscillator/env
+
+// midi notes
+var noteArray = [0, 2, 4, 7, 9, 12];
+var noteArrayColors = [];
+for (var j in noteArray) {
+  noteArrayColors[j] = [Math.floor(Math.random()*255),Math.floor(Math.random()*255)]; 
+}
+var root = 48;
+
+
 function setup() {
   bpm = 120;
-  ticksPerBeat = 16;
-  beatsPerMeasure = 16;
+  ticksPerBeat = 3;
+  beatsPerMeasure = 8;
   pattern = new Array(beatsPerMeasure);
   beatLength = 60 * 1000 / bpm;
   clock = new p5.Part(beatsPerMeasure, 1/ticksPerBeat/4);
@@ -27,6 +42,15 @@ function setup() {
   // interface
   createCanvas(400, 400);
   seqRadius = 300;
+
+  // sound setup
+  for (var i = 0; i <= 8; i++) {
+    oscillators.push( new p5.Oscillator() );
+    envelopes.push( new p5.Env(0.005, 0.65, 0.5, 0.2) );
+  }
+
+  ticksPerMeasure = beatsPerMeasure * ticksPerBeat;
+
 }
 
 function draw() {
@@ -55,6 +79,9 @@ function draw() {
       fill(200);
       noStroke();
       arc(0, 0, seqRadius*2, seqRadius*2, curBeatAngle, curBeatAngle + beatAngle);
+      // if (pattern[i] instanceof Slice) {
+      //   playNote(pattern[i].radius);
+      // }
     }
   }
 
@@ -76,67 +103,100 @@ var ticks = 0;
 var beats = 0;
 function tick(time) {
   ticks += 1;
+
+  var currentTick = ticks % ticksPerMeasure;
+  if (pattern[currentTick] instanceof Slice) {
+    playNote(pattern[currentTick].radius);
+    pattern[currentTick].c[2] = 0;
+  }
+
   if (ticks % ticksPerBeat === 0) {
     beats += 1;
     currentBeat = beats % beatsPerMeasure;
     currentMeasure = Math.floor(beats / beatsPerMeasure);
-    console.log(currentMeasure + ' : ' + currentBeat);
   }
-
-  var ticksPerMeasure = beatsPerMeasure * ticksPerBeat;
   howFarInMeasure = (ticks % ticksPerMeasure) / ticksPerMeasure;
 }
 
 var slices = [];
+
 function mousePressed() {
-  new Slice(mouseX, mouseY);
+  if (dragging === false) {
+    checkSlice(mouseX, mouseY);
+  }
+}
+
+var dragging = false;
+function mouseDragged() {
+  dragging = true;
+  checkSlice(mouseX, mouseY);
+}
+
+function mouseReleased() {
+  dragging = false;
 }
 
 
 // ============
 // Slice class
 // ============
-var Slice = function(x, y) {
-  console.log(x, y);
-  this.x = x - width/2;
-  this.y = y - height/2;
+function checkSlice(_x, _y) {
+  var x = _x - width/2;
+  var y = _y - height/2;
+
+  var angle = Math.abs( Math.atan2(y, -x) - PI );// - Math.atan2(height/2, width);
+  var step = Math.floor( map(angle, 0, TWO_PI, 0, ticksPerMeasure) );
+
+  if (dragging) {
+    if (pattern[step] !== undefined) {
+      pattern[step].radius = dist(mouseX - width/2, mouseY - height/2, 0, 0);
+    }
+  }
+
+  else {
+    // if there is already a block at this step, remove it
+    if (pattern[step] !== undefined) {
+      console.log('remove');
+      pattern[step] = undefined;
+    } else {
+      new Slice(x, y, angle);
+    }
+  }
+}
+
+var Slice = function(x, y, angle) {
+  this.x = x;
+  this.y = y;
   this.radius = dist(this.x, this.y, 0, 0);
-  this.c = [255, 255, 255];
-  var angle = Math.abs( Math.atan2(this.y, -this.x) - PI );// - Math.atan2(height/2, width);
-  var step = Math.floor( map(angle, 0, TWO_PI, 0, beatsPerMeasure) );
+  this.pos = Math.floor( map(this.radius, 0, dist(0,0,width/2,height/2), 0, noteArray.length) );
+  this.c = [noteArrayColors[this.pos][0], noteArrayColors[this.pos][1], 255];
+  var step = Math.floor( map(angle, 0, TWO_PI, 0, ticksPerMeasure) );
 
   // if there is already a block at this step, remove it
   if (pattern[step] !== undefined) {
-    pattern[step].remove();
     console.log('remove');
+  } else {
+    pattern[step] = this;
+    this.angle = step * TWO_PI/ticksPerMeasure;
   }
-
-  pattern[step] = this;
-  this.angle = step * TWO_PI/beatsPerMeasure;
 }
 
 Slice.prototype.update = function() {
-  this.c[2] += 20;
-  this.c[1] += 20;
+  this.c[2] += 10;
+  this.pos = Math.floor( map(this.radius, 0, dist(0,0,width/2,height/2), 0, noteArray.length) );
+  this.c = [noteArrayColors[this.pos][0], noteArrayColors[this.pos][1], this.c[2]];
+
   fill(this.c);
-  arc(0, 0, this.radius*2, this.radius*2, this.angle, this.angle + TWO_PI/beatsPerMeasure);
-  // rect(this.x, this.y, this.w, this.h);
+  arc(0, 0, this.radius*2, this.radius*2, this.angle, this.angle + TWO_PI/ticksPerMeasure);
 }
 
-Slice.prototype.isTouching = function(x, y) {
-  if ( (this.x <= x) &&  (x <= (this.x + this.w) ) && (this.y <= y) && (y <= (this.y + this.h) ) ) {
-    return true;
-  }
-  else {
-    return false;
-  }
-}
-
-Slice.prototype.remove = function() {
-  // slices.slice(this);
-  // update drumPattern array to zero
-  // var whichDrum = drumArray.length - Math.round( map(this.y, 0, height, hDiv, 0) );
-  // var whichStep = Math.round(map(this.x, 0, width, 0, wDiv));
-  // drumPatterns[whichDrum][whichStep] = null;
-
+function playNote(radius) {
+  var pos = Math.round( map(radius, 0, dist(0,0,width/2,height/2), 0, noteArray.length) );
+  var n = noteArray[pos] + root;
+  console.log(pos);
+  var osc = oscillators[current % (oscillators.length- 1)];
+  var env = envelopes[current % (envelopes.length - 1)];
+  osc.freq(midiToFreq(n));
+  env.play(osc);
+  current++;
 }
