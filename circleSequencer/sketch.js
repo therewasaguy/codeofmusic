@@ -8,6 +8,7 @@ var clock;
 
 var currentMeasure;
 var currentBeat;
+var currentTick;
 var howFarInMeasure;
 
 var seqRadius;
@@ -63,7 +64,7 @@ function draw() {
   ellipse(0, 0, seqRadius*2, seqRadius*2);
 
   var beatAngle = TWO_PI / beatsPerMeasure;
-
+  var tickAngle = TWO_PI / ticksPerMeasure;
   // draw grid lines
   for (var i = 0; i < beatsPerMeasure; i++) {
     stroke(100);
@@ -73,15 +74,15 @@ function draw() {
     var beat_x = cos(curBeatAngle) * seqRadius;
     var beat_y = sin(curBeatAngle) * seqRadius;
     line(0, 0, beat_x, beat_y);
+  }
+  for (var j = 0; j < ticksPerMeasure; j++) {
+    var curTickAngle = tickAngle * j;
 
     // highlight current beat
-    if (i === currentBeat){
+    if (j === currentTick){
       fill(200);
       noStroke();
-      arc(0, 0, seqRadius*2, seqRadius*2, curBeatAngle, curBeatAngle + beatAngle);
-      // if (pattern[i] instanceof Slice) {
-      //   playNote(pattern[i].radius);
-      // }
+      arc(0, 0, seqRadius*2, seqRadius*2, curTickAngle, curTickAngle + tickAngle/ticksPerBeat);
     }
   }
 
@@ -104,7 +105,7 @@ var beats = 0;
 function tick(time) {
   ticks += 1;
 
-  var currentTick = ticks % ticksPerMeasure;
+  currentTick = ticks % ticksPerMeasure;
   if (pattern[currentTick] instanceof Slice) {
     playNote(pattern[currentTick].radius);
     pattern[currentTick].c[2] = 0;
@@ -156,7 +157,6 @@ function checkSlice(_x, _y) {
   else {
     // if there is already a block at this step, remove it
     if (pattern[step] !== undefined) {
-      console.log('remove');
       pattern[step] = undefined;
     } else {
       new Slice(x, y, angle);
@@ -168,7 +168,7 @@ var Slice = function(x, y, angle) {
   this.x = x;
   this.y = y;
   this.radius = dist(this.x, this.y, 0, 0);
-  this.pos = Math.floor( map(this.radius, 0, dist(0,0,width/2,height/2), 0, noteArray.length) );
+  this.pos = constrain(Math.floor( map(this.radius, 0, dist(0,0,width/2,height/2), 0, noteArray.length-1) ), 0, noteArray.length-1);
   this.c = [noteArrayColors[this.pos][0], noteArrayColors[this.pos][1], 255];
   var step = Math.floor( map(angle, 0, TWO_PI, 0, ticksPerMeasure) );
 
@@ -183,7 +183,7 @@ var Slice = function(x, y, angle) {
 
 Slice.prototype.update = function() {
   this.c[2] += 10;
-  this.pos = Math.floor( map(this.radius, 0, dist(0,0,width/2,height/2), 0, noteArray.length) );
+  this.pos = constrain(Math.floor( map(this.radius, 0, dist(0,0,width/2,height/2), 0, noteArray.length-1) ), 0, noteArray.length-1);
   this.c = [noteArrayColors[this.pos][0], noteArrayColors[this.pos][1], this.c[2]];
 
   fill(this.c);
@@ -191,9 +191,8 @@ Slice.prototype.update = function() {
 }
 
 function playNote(radius) {
-  var pos = Math.round( map(radius, 0, dist(0,0,width/2,height/2), 0, noteArray.length) );
+  var pos = Math.floor( map(radius, 0, dist(0,0,width/2,height/2), 0, noteArray.length) );
   var n = noteArray[pos] + root;
-  console.log(pos);
   var osc = oscillators[current % (oscillators.length- 1)];
   var env = envelopes[current % (envelopes.length - 1)];
   osc.freq(midiToFreq(n));
