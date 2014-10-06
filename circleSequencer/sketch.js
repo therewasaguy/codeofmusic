@@ -11,10 +11,13 @@ var howFarInMeasure;
 
 var seqRadius;
 
+var pattern = []
+
 function setup() {
   bpm = 120;
   ticksPerBeat = 16;
   beatsPerMeasure = 16;
+  pattern = new Array(beatsPerMeasure);
   beatLength = 60 * 1000 / bpm;
   clock = new p5.Part(beatsPerMeasure, 1/ticksPerBeat/4);
   clock.loop();
@@ -60,8 +63,10 @@ function draw() {
   var playHeadPos = map(howFarInMeasure, 0, 1, 0, TWO_PI);
   line(0, 0, cos(playHeadPos)*seqRadius, sin(playHeadPos)*seqRadius);
 
-  for (var j in slices) {
-    slices[j].update();
+  for (var j in pattern) {
+    if (pattern[j] instanceof Slice) {
+      pattern[j].update();
+    }
   }
 
   pop();
@@ -84,7 +89,7 @@ function tick(time) {
 
 var slices = [];
 function mousePressed() {
-  slices.push( new Slice(mouseX, mouseY) );
+  new Slice(mouseX, mouseY);
 }
 
 
@@ -95,10 +100,19 @@ var Slice = function(x, y) {
   console.log(x, y);
   this.x = x - width/2;
   this.y = y - height/2;
-  this.quadrant = 
   this.radius = dist(this.x, this.y, 0, 0);
   this.c = [255, 255, 255];
-  this.angle = Math.abs( Math.atan2(this.y, -this.x) - PI );// - Math.atan2(height/2, width);
+  var angle = Math.abs( Math.atan2(this.y, -this.x) - PI );// - Math.atan2(height/2, width);
+  var step = Math.floor( map(angle, 0, TWO_PI, 0, beatsPerMeasure) );
+
+  // if there is already a block at this step, remove it
+  if (pattern[step] !== undefined) {
+    pattern[step].remove();
+    console.log('remove');
+  }
+
+  pattern[step] = this;
+  this.angle = step * TWO_PI/beatsPerMeasure;
 }
 
 Slice.prototype.update = function() {
@@ -119,11 +133,10 @@ Slice.prototype.isTouching = function(x, y) {
 }
 
 Slice.prototype.remove = function() {
+  // slices.slice(this);
   // update drumPattern array to zero
-  var whichDrum = drumArray.length - Math.round( map(this.y, 0, height, hDiv, 0) );
-  var whichStep = Math.round(map(this.x, 0, width, 0, wDiv));
-  drumPatterns[whichDrum][whichStep] = null;
+  // var whichDrum = drumArray.length - Math.round( map(this.y, 0, height, hDiv, 0) );
+  // var whichStep = Math.round(map(this.x, 0, width, 0, wDiv));
+  // drumPatterns[whichDrum][whichStep] = null;
 
-  // update socket.io
-  sendDrumPattern();
 }
