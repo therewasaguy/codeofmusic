@@ -1,0 +1,335 @@
+{      
+      "1" : {       
+        "audio" : "sample",   
+        "image" : "image",   
+        "keyCode" : 49,
+        "playing" : false
+        
+      },  
+      
+      "2" : {       
+        "audio" : "",   
+        "image" : "",   
+        "keyCode" : 50,
+         "playing" : false     
+      },
+    
+      "3" : {       
+        "audio" : "",     
+        "image" : "",   
+        "keyCode" : 51,
+         "playing" : false   
+      },
+      
+      "4" : {         
+        "audio" : "",   
+        "image" : "", 
+        "playing" : false,    
+        "keyCode" : 52   
+      },
+      
+      "5" : {       
+        "audio" : "",   
+        "image" : "", 
+        "playing" : false,  
+        "keyCode" : 53   
+      },
+      
+      "6" : {       
+        "audio" : "",     
+        "image" : "", 
+        "playing" : false,    
+        "keyCode" : 54   
+      },
+      
+      "7" : {         
+        "audio" : "",     
+        "image" : "",
+        "playing" : false,
+        "keyCode" : 55     
+      },  
+      
+      "8" : {     
+        "audio" : "",     
+        "image" : "", 
+        "playing" : false,    
+        "keyCode" : 56   
+      },
+    
+      "9" : {       
+        "audio" : "",   
+        "image" : "", 
+        "playing" : false,  
+        "keyCode" : 57    
+      },
+      
+      "0" : {       
+        "audio" : "",     
+        "image" : "", 
+        "playing" : false,    
+        "keyCode" : 48      
+      },
+        
+        "189" : { 
+        "this is a hyphen -": 0,      
+        "audio" : "",     
+        "image" : "", 
+        "playing" : false,    
+        "keyCode" : 189     
+      },
+        
+        "187" : {
+        "this is equals = " : 0,      
+        "audio" : "",     
+        "image" : "", 
+        "playing" : false,    
+        "keyCode" : 187      
+      },
+        
+        "z" : {
+        "audio" : "sample",
+        "image" : "image",
+        "playing" : false,
+        "keyCode" : 90
+      },
+      "x" : {         
+        "audio" : "",     
+        "image" : "", 
+        "playing" : false,    
+        "keyCode" : 88       
+      },
+    
+      "c" : {         
+        "audio" : "",     
+        "image" : "", 
+        "playing" : false,   
+        "keyCode" : 67    
+      },
+      
+      "v" : {         
+        "audio" : "",     
+        "image" : "", 
+        "playing" : false,    
+        "keyCode" : 86       
+      },
+      
+      "b" : {         
+        "audio" : "",     
+        "image" : "",
+        "playing" : false,     
+        "keyCode" : 66    
+      },
+      
+      "n" : {         
+        "audio" : "",     
+        "image" : "",
+        "playing" : false,     
+        "keyCode" : 78  
+      },
+      
+      "m" : {         
+        "audio" : "",     
+        "image" : "", 
+        "playing" : false,    
+        "keyCode" : 77     
+      }, 
+     
+      
+      "188" : {    
+        "this is a comma ,": 0,
+        "audio" : "",     
+        "image" : "", 
+        "playing" : false,  
+        "keyCode" : 188    
+      },
+    
+      "190" : { 
+        "this is a period .": 0,     
+        "audio" : "",   
+        "image" : "",
+        "playing" : false,   
+        "keyCode" : 190    
+      },
+      
+      "191" : {  
+        "this is a forwardslash / ": 0,       
+        "audio" : "",     
+        "image" : "", 
+        "playing" : false,    
+        "keyCode" : 191    
+      },
+      "220" : {  
+        "this is a backslash / ": 0,       
+        "audio" : "",     
+        "image" : "", 
+        "playing" : false,    
+        "keyCode" : 220   
+      },
+      
+      "a" : {       
+        "audio" : "",   
+        "image" : "", 
+        "playing" : false,  
+        "keyCode" : 65    
+      },
+      
+      "s" : {
+        "audio" : "",   
+        "image" : "",
+        "playing" : false,   
+        "keyCode" : 83   
+      },
+      
+      "d" : {         
+        "audio" : "",   
+        "image" : "",
+        "playing" : false,   
+        "keyCode" : 68   
+      },  
+      
+      "f" : {       
+        "audio" : "",   
+        "image" : "",
+        "playing" : false,     
+        "keyCode" : 70     
+      },
+    
+      "g" : {         
+        "audio" : "",   
+        "image" : "",
+        "playing" : false,   
+        "keyCode" : 71    
+      },
+      
+      "h" : {         
+        "audio" : "",   
+        "image" : "",
+        "playing" : false,   
+        "keyCode" : 72  
+      },
+      
+      "j" : {         
+        "audio" : "",   
+        "image" : "",
+        "playing" : false,   
+        "keyCode" : 74 
+      },
+      
+      "k" : {       
+        "audio" : "",
+        "image" : "",  
+        "playing" : false, 
+        "keyCode" : 75 
+      },
+
+      "l" : {       
+        "audio" : "",   
+        "image" : "", 
+        "playing" : false,  
+        "keyCode" : 76   
+      },
+    
+      "186" : {  
+        "this is a semi colon ;" : 0,     
+        "audio" : "",   
+        "image" : "", 
+        "playing" : false,  
+        "keyCode" : 186  
+      },
+      
+      "222" : { 
+        "this is a single quote ' ": 0,      
+        "audio" : "",     
+        "image" : "",
+        "playing" : false,     
+        "keyCode" : 222      
+      },
+      
+      "q" : {         
+        "audio" : "",     
+        "image" : "",
+        "playing" : false,     
+        "keyCode" : 81   
+      },
+      
+      "w" : {         
+        "audio" : "",     
+        "image" : "",
+        "playing" : false,   
+        "keyCode" : 87   
+      },
+      
+      "e" : {       
+        "audio" : "",   
+        "image" : "", 
+        "playing" : false,  
+        "keyCode" : 69   
+      },  
+      
+      "r" : {       
+        "audio" : "",   
+        "image" : "",  
+        "playing" : false, 
+        "keyCode" : 82     
+      },
+    
+      "t" : {       
+        "audio" : "",     
+        "image" : "",
+        "playing" : false,   
+        "keyCode" : 84   
+      },
+      
+      "y" : {         
+        "audio" : "",   
+        "image" : "", 
+        "playing" : false,    
+        "keyCode" : 89   
+      },
+      
+      "u" : {       
+        "audio" : "",   
+        "image" : "", 
+        "playing" : false,  
+        "keyCode" : 85   
+      },
+      
+      "i" : {       
+        "audio" : "",     
+        "image" : "",
+        "playing" : false,     
+        "keyCode" : 73   
+      },
+      
+      "o" : {         
+        "audio" : "",     
+        "image" : "",
+        "playing" : false,
+        "keyCode" : 79     
+      },  
+      
+      "p" : {     
+        "audio" : "",     
+        "image" : "",
+        "playing" : false,     
+        "keyCode" : 80   
+      },
+    
+      "219" : {   
+        "this is an open bracket [" : 0,   
+        "audio" : "",   
+        "image" : "", 
+        "playing" : false,  
+        "keyCode" : 219    
+      },
+      
+      "221" : {    
+        "this is a closed bracket ]" : 0, 
+        "audio" : "",     
+        "image" : "", 
+        "playing" : false,    
+        "keyCode" : 221      
+      }
+      
+
+}
