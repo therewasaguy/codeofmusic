@@ -18,8 +18,8 @@ function loadRemote(path, callback) {
   fetch.send();
 }
 
-// loadRemote('../midifiles/michael_jackson-billie_jean.mid', makeMidi);
-loadRemote('../midifiles/stevie_wonder-superstition.mid', makeMidi);
+loadRemote('../midifiles/michael_jackson-billie_jean.mid', makeMidi);
+// loadRemote('../midifiles/stevie_wonder-superstition.mid', makeMidi);
 
 var midiFile;
 var m;
