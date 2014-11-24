@@ -1,4 +1,4 @@
-var osc = new p5.Oscillator();
+var osc = new p5.SinOsc();
 var env = new p5.Env(0.01, 0.9, 0.2, 0.1, 0.05, 0, 0.0, 0.0);
 
 var clock = new p5.Part();
