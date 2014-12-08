@@ -1,18 +1,33 @@
-var osc = new p5.SinOsc();
-var env = new p5.Env(0.01, 0.9, 0.2, 0.1, 0.05, 0, 0.0, 0.0);
-
 var clock = new p5.Part();
 clock.setBPM(52);
-// clock.loop();
 clock.onStep(playNext);
+
+window.onload = function() {
+  startMidiJS();
+}
+
+function startMidiJS() {
+  MIDI.loadPlugin({
+      soundfontUrl: "../lib/MIDI.js/soundfont/",
+      instruments: ["electric_piano_1", "fretless_bass", "synth_strings_1", "voice_oohs", "electric_guitar_muted", "string_ensemble_2", "kalimba", "banjo", "acoustic_grand_piano", "synth_drum" ],
+      callback: function() {
+        // MIDI.programChange(0, 5);
+        // MIDI.programChange(1, 108);
+        clock.loop();
+      }
+    });
+};
 
 var index = 0;
 var sequence = [];
 
+
 function playNext() {
-  var frequency = p5.prototype.midiToFreq(sequence[index%(sequence.length-1)])
-  osc.freq(frequency);
-  env.play(osc);
+  // var frequency = p5.prototype.midiToFreq(sequence[index%(sequence.length-1)])
+  // osc.freq(frequency);
+  // env.play(osc);
+  MIDI.noteOn(1, sequence[index%(sequence.length-1)], 65, 0);
+
   index++;
 }
 

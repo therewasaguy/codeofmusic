@@ -86,7 +86,13 @@ function createChannels(midiInfo) {
   sliderHeight = window.innerHeight ;
 
   for (var j in output.header.voices) {
+    console.log(output.header.voices[j]['program']);
     output.sketches[j] = new p5(sliderSketch);
+
+    // assign midi voice
+      MIDI.channels[j].instrument = output.header.voices[j]['program'];
+
+    // MIDI.programChange(j, output.header.voices[j]['program']);
   }
 }
 
