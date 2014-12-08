@@ -24,7 +24,7 @@ loadRemote('../midifiles/michael_jackson-billie_jean.mid', makeMidi);
 var midiFile;
 var m;
 
-var output = {'header': {'bpm': 120, 'timeSignature': [4, 4], 'voices': [] }, 'channel': [] };
+var output = {'header': {'bpm': 120, 'timeSignature': [4, 4], 'voices': {} }, 'channel': [], 'sketches':{} };
 
 
 function makeMidi(data){
@@ -35,6 +35,9 @@ function makeMidi(data){
   for (var i in midiFile.tracks) {
     parseTrackData(midiFile.tracks[i], output);
   }
+
+  // generate UI and track conrollers
+  createChannels(output);
   // var pianoMidiData = midiFile.tracks[0];
 
   // // make a markov of note transitions
@@ -66,7 +69,7 @@ function parseTrackData(trackData, output) {
 
     // parse voices from channel names
     else if (trackData[i].subtype === 'programChange'){
-      console.log(trackData[i]);
+      // console.log(trackData[i]);
       var channel = trackData[i].channel;
       var program = trackData[i].programNumber;
       if (typeof (output.header.voices[channel]) === 'undefined') {

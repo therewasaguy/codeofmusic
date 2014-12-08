@@ -3,7 +3,7 @@ var env = new p5.Env(0.01, 0.9, 0.2, 0.1, 0.05, 0, 0.0, 0.0);
 
 var clock = new p5.Part();
 clock.setBPM(52);
-clock.loop();
+// clock.loop();
 clock.onStep(playNext);
 
 var index = 0;
