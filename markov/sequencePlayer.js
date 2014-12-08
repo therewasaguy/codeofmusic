@@ -9,11 +9,12 @@ window.onload = function() {
 function startMidiJS() {
   MIDI.loadPlugin({
       soundfontUrl: "../lib/MIDI.js/soundfont/",
-      instruments: ["electric_piano_1", "fretless_bass", "synth_strings_1", "voice_oohs", "electric_guitar_muted", "string_ensemble_2", "kalimba", "banjo", "acoustic_grand_piano", "synth_drum" ],
+      instruments: ["electric_piano_1", "fretless_bass", "synth_strings_1", "voice_oohs", "electric_guitar_muted", "string_ensemble_2"],
       callback: function() {
         // MIDI.programChange(0, 5);
         // MIDI.programChange(1, 108);
-        clock.loop();
+        // clock.loop();
+        console.log('midi loaded!');
       }
     });
 };

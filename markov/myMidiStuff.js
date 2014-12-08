@@ -24,7 +24,7 @@ loadRemote('../midifiles/michael_jackson-billie_jean.mid', makeMidi);
 var midiFile;
 var m;
 
-var output = {'header': {'bpm': 120, 'timeSignature': [4, 4], 'voices': {} }, 'channel': [], 'sketches':{} };
+var output = {'header': {'bpm': 120, 'timeSignature': [4, 4], 'voices': {} }, 'channel': {}, 'sketches':{} };
 
 
 function makeMidi(data){
@@ -38,13 +38,12 @@ function makeMidi(data){
 
   // generate UI and track conrollers
   createChannels(output);
-  // var pianoMidiData = midiFile.tracks[0];
 
-  // // make a markov of note transitions
-  noteTransitioner = new MarkovGenerator(2, 5);
-  var pianoTrack = parseNotes(midiFile.tracks[0]);
-  noteTransitioner.feed(pianoTrack);
-  sequence = noteTransitioner.generate();
+  // make a markov of note transitions
+  // noteTransitioner = new MarkovGenerator(2, 5);
+  // var pianoTrack = parseNotes(midiFile.tracks[0]);
+  // noteTransitioner.feed(pianoTrack);
+  // sequence = noteTransitioner.generate();
   // make a markov that maps notes to durations
 }
 

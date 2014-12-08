@@ -78,6 +78,22 @@ var sliderSketch = function(sketch) {
     }
   }
 
+  // sketches have sequences associated with them
+  sketch.sequence = null;
+
+  // sketches can generate markovs
+  sketch.markovGenerator = new MarkovGenerator(2, 24);
+
+  // feed this markov generator
+  sketch.feedMarkov = function(stuff) {
+    sketch.markovGenerator.feed(stuff);
+    sketch.sequence = sketch.markovGenerator.generate();
+  }
+
+  sketch.generateNewSequence = function() {
+    sketch.sequence = sketch.markovGenerator.generate();
+  }
+
 };
 
 
@@ -90,9 +106,19 @@ function createChannels(midiInfo) {
     output.sketches[j] = new p5(sliderSketch);
 
     // assign midi voice
+    if (j === '9') {
+      console.log('drum channel')
+    } else {
       MIDI.channels[j].instrument = output.header.voices[j]['program'];
+    }
 
+    output.sketches[j].feedMarkov(output.channel[j]);
     // MIDI.programChange(j, output.header.voices[j]['program']);
   }
 }
 
+function getFrameRate() {
+  for (i in output.sketches) {
+    console.log(output.sketches[i].frameRate())
+  };
+}
