@@ -107,17 +107,18 @@ function parseTrackData(trackData, output) {
       var chan = trackData[i].channel;
       if (typeof(note) == 'number') {
         if (typeof(output.channel[chan]) === 'undefined') {
-          output.channel[chan] = [];
+          output.channel[chan] = {'sequence': [], 'durations': [], 'deltaTimes': [], 'velocities': [], 'notes': [], 'chords': [] };
         }
         var currentBeat = deltaTimeToMeter(currentTime);
 
         // find the corresponding noteOn event and add to that event
-        for (var j = output.channel[chan].length - 1; j >= 0; j--) {
-          var prevEvnt = output.channel[chan][j];
+        for (var j = output.channel[chan].sequence.length - 1; j >= 0; j--) {
+          var prevEvnt = output.channel[chan].sequence[j];
           if (prevEvnt.note === note && typeof(prevEvnt.noteOff) === 'undefined') {
             var duration = currentBeat - prevEvnt.noteOn;
             prevEvnt.duration = duration;
             prevEvnt.noteOff = currentBeat;
+            output.channel[chan].durations.push(duration);
             break;
           }
         }
@@ -130,10 +131,40 @@ function parseTrackData(trackData, output) {
       var chan = trackData[i].channel;
       if (typeof(note) == 'number') {
         if (typeof(output.channel[chan]) === 'undefined') {
-          output.channel[chan] = [];
+          output.channel[chan] = {'sequence': [], 'durations': [], 'deltaTimes': [], 'velocities': [], 'notes': [], 'chords': [] };
         }
         var currentBeat = deltaTimeToMeter(currentTime);
-        output.channel[chan].push( {
+
+        output.channel[chan].velocities.push(trackData[i].velocity);
+
+        var deltaTime = deltaTimeToMeter(trackData[i].deltaTime);
+        var deltaTimes = output.channel[chan].deltaTimes;
+        var notes = output.channel[chan].notes;
+        var chords = output.channel[chan].chords;
+        var sequence = output.channel[chan].sequence;
+
+        if (sequence.length > 3 && sequence[sequence.length - 1].noteOn - sequence[sequence.length - 2].noteOn !== 0) {
+          var v = 2;
+          var chord = [];
+ 
+          while (sequence.length > v && sequence[sequence.length - v].noteOn - sequence[sequence.length - v - 1].noteOn === 0) {
+            chord.push(notes[notes.length - v]);
+            v++;
+            // chords.push([ notes[notes.length - v - 1], notes[notes.length - 1] ]);
+          }
+          if (typeof (notes[notes.length - v]) !== 'undefined'){
+            chord.push(notes[notes.length - v]);
+          }
+
+          if (chord.length > 2) {
+            chords.push(chord);
+          }
+        }
+
+        deltaTimes.push(deltaTime);
+        notes.push(note);
+
+        sequence.push( {
           'note' : note,
           'noteOn' : currentBeat,
           'velocity' : trackData[i].velocity

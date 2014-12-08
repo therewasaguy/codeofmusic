@@ -33,7 +33,7 @@ function playNext() {
 }
 
 function regenerateSequence() {
-  sequence = noteTransitioner.generate('random');
+  // sequence = noteTransitioner.generate('random');
   index = 0;
 }
 
