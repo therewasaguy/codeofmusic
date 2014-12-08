@@ -82,6 +82,9 @@ var sliderSketch = function(sketch) {
     }
   }
 
+  // make controls within each sketch
+
+
   // sketches have multiple types of sequences associated with them
   // output.channel[chan] = {'sequence': [], 'durations': [], 'deltaTimes': [], 'velocities': [], 'notes': [], 'chords': [] };
   sketch.sequence = {
@@ -94,11 +97,11 @@ var sliderSketch = function(sketch) {
 
   // sketches can generate markovs
   sketch.markovGens = {
-    'durations': new MarkovGenerator(2, 4),
-    'deltaTimes': new MarkovGenerator(2, 4),
-    'velocities': new MarkovGenerator(2, 4),
-    'notes': new MarkovGenerator(2, 4),
-    'chords': new MarkovGenerator(2, 4)
+    'durations': new MarkovGenerator(8, 3),
+    'deltaTimes': new MarkovGenerator(8, 3),
+    'velocities': new MarkovGenerator(8, 3),
+    'notes': new MarkovGenerator(8, 3),
+    'chords': new MarkovGenerator(8, 3)
   }
 
   // feed this markov generator
@@ -123,6 +126,16 @@ var sliderSketch = function(sketch) {
     sketch.sequence.velocities = sketch.markovGens['velocities'].generate();
     sketch.sequence.notes = sketch.markovGens['notes'].generate();
     sketch.sequence.chords = sketch.markovGens['chords'].generate();
+
+    // make sure total duration is equal to a multiple of whole note
+    var sumOfDeltaTimes  = 0;
+    for (var i in sketch.sequence.deltaTimes) {
+      sumOfDeltaTimes += sketch.sequence.deltaTimes[i];
+    }
+    if (sumOfDeltaTimes % 0.5 !== 0) {
+      sketch.sequence.deltaTimes.push(sumOfDeltaTimes % 0.5);
+    }
+
   }
 
   sketch.needlePos = 0;

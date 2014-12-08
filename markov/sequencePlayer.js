@@ -4,13 +4,6 @@
 
 var clockInterval = '64';
 
-function initTone() {
-  Tone.Transport.setBpm(output.header.bpm);
-  Tone.Transport.start();
-  Tone.Transport.setInterval(playNext, clockInterval+'n');
-
-}
-
 window.onload = function() {
   startMidiJS();
 }
@@ -29,10 +22,25 @@ function startMidiJS() {
     });
 };
 
+function initTone() {
+  Tone.Transport.setBpm(output.header.bpm);
+  Tone.Transport.start();
+  Tone.Transport.setInterval(playNext, clockInterval+'n');
+  loadDrumChannel();
+}
+
+var drumPlayers = {};
+function loadDrumChannel() {
+  for (var i = 35; i <= 81; i++) {
+    drumPlayers[i] = new Tone.Player('../lib/MIDI.js/soundfont/drums_fluidv3/'+i+'.mp3');
+    drumPlayers[i].retrigger = true;
+    drumPlayers[i].toMaster();
+  }
+  console.log('drums loaded!');
+}
 
 function playNext() {
   var oneIncrement = 1/ parseInt(clockInterval) * 4;
-  console.log(oneIncrement);
 
   for (var i in output.sketches) {
     var thisSketch = output.sketches[i];
@@ -46,9 +54,14 @@ function playNext() {
       var note = seq.notes[pos % seq.notes.length];
       var velocity = seq.velocities[pos % seq.velocities.length] * output.sketches[i].volume;
       var duration = seq.durations[pos % seq.durations.length];
-      MIDI.noteOn(i, note, velocity, Math.abs(nextBeat));
-      MIDI.noteOff(i, note, duration + Math.abs(nextBeat));
 
+      if (i === '9') {
+        drumPlayers[note].start(0);
+        console.log(note);
+      } else {
+        MIDI.noteOn(i, note, velocity, Math.abs(nextBeat));
+        MIDI.noteOff(i, note, duration + Math.abs(nextBeat));
+      }
       // increment position
       thisSketch.needlePos++;
 
