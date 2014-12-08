@@ -1,7 +1,3 @@
-// var clock = new p5.Part();
-// clock.setBPM(52);
-// clock.onStep(playNext);
-
 var clockInterval = '64';
 
 window.onload = function() {
@@ -12,13 +8,13 @@ function startMidiJS() {
   MIDI.loadPlugin({
       soundfontUrl: "../lib/MIDI.js/soundfont/",
 
-      // instruments: ["electric_piano_1", "fretless_bass", "voice_oohs", "synth_strings_1", "electric_guitar_muted", "string_ensemble_2"],
+      instruments: ["electric_piano_1", "fretless_bass", "voice_oohs", "synth_strings_1", "electric_guitar_muted", "string_ensemble_2"],
 
       callback: function() {
 
-        // for (var i in programChanges) {
-        //   MIDI.programChange(programChanges[i][0], programChanges[i][1]);
-        // }
+        for (var i in programChanges) {
+          MIDI.programChange(programChanges[i][0], programChanges[i][1]);
+        }
 
         initTone();
         console.log('midi loaded!');
