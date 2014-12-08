@@ -1,6 +1,15 @@
-var clock = new p5.Part();
-clock.setBPM(52);
-clock.onStep(playNext);
+// var clock = new p5.Part();
+// clock.setBPM(52);
+// clock.onStep(playNext);
+
+var clockInterval = '64';
+
+function initTone() {
+  Tone.Transport.setBpm(output.header.bpm);
+  Tone.Transport.start();
+  Tone.Transport.setInterval(playNext, clockInterval+'n');
+
+}
 
 window.onload = function() {
   startMidiJS();
@@ -9,27 +18,45 @@ window.onload = function() {
 function startMidiJS() {
   MIDI.loadPlugin({
       soundfontUrl: "../lib/MIDI.js/soundfont/",
-      instruments: ["electric_piano_1", "fretless_bass", "synth_strings_1", "voice_oohs", "electric_guitar_muted", "string_ensemble_2"],
+      instruments: ["electric_piano_1", "fretless_bass", "voice_oohs", "synth_strings_1", "electric_guitar_muted", "string_ensemble_2"],
       callback: function() {
-        // MIDI.programChange(0, 5);
-        // MIDI.programChange(1, 108);
-        // clock.loop();
+        for (var i in programChanges) {
+          MIDI.programChange(programChanges[i][0], programChanges[i][1]);
+        }
+        initTone();
         console.log('midi loaded!');
       }
     });
 };
 
-var index = 0;
-var sequence = [];
-
 
 function playNext() {
-  // var frequency = p5.prototype.midiToFreq(sequence[index%(sequence.length-1)])
-  // osc.freq(frequency);
-  // env.play(osc);
-  MIDI.noteOn(1, sequence[index%(sequence.length-1)], 65, 0);
+  var oneIncrement = 1/ parseInt(clockInterval) * 4;
+  console.log(oneIncrement);
 
-  index++;
+  for (var i in output.sketches) {
+    var thisSketch = output.sketches[i];
+    thisSketch.beatsSinceLastNote += oneIncrement;
+    var seq = thisSketch.sequence;
+    var pos = thisSketch.needlePos;
+
+    if (seq.deltaTimes[pos % seq.deltaTimes.length] - thisSketch.beatsSinceLastNote < oneIncrement) {
+      var stringSinceLastBeat = (thisSketch.beatsSinceLastNote - seq.deltaTimes[pos % seq.deltaTimes.length] ).toString();
+      nextBeat = Tone.Transport.transportTimeToSeconds(stringSinceLastBeat);
+      var note = seq.notes[pos % seq.notes.length];
+      var velocity = seq.velocities[pos % seq.velocities.length] * output.sketches[i].volume;
+      var duration = seq.durations[pos % seq.durations.length];
+      MIDI.noteOn(i, note, velocity, Math.abs(nextBeat));
+      MIDI.noteOff(i, note, duration + Math.abs(nextBeat));
+
+      // increment position
+      thisSketch.needlePos++;
+
+      // reset beatsSinceLastNote
+      thisSketch.beatsSinceLastNote = 0;
+    }
+  }
+
 }
 
 function regenerateSequence() {

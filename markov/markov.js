@@ -45,6 +45,15 @@ MarkovGenerator.prototype.feed = function(score) {
   }
 }
 
+MarkovGenerator.prototype.reset = function(n, max) {
+  this.ngrams = {};
+  this.beginnings = [];
+  var n = n || this.n;
+  var max = max || this.max;
+  this.n = n;
+  this.max = max;
+}
+
 // helper function to return a slice of n-length at a position in a score
 MarkovGenerator.prototype.parseGram = function(position, score) {
   var gram = [];

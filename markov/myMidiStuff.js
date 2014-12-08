@@ -38,13 +38,6 @@ function makeMidi(data){
 
   // generate UI and track conrollers
   createChannels(output);
-
-  // make a markov of note transitions
-  // noteTransitioner = new MarkovGenerator(2, 5);
-  // var pianoTrack = parseNotes(midiFile.tracks[0]);
-  // noteTransitioner.feed(pianoTrack);
-  // sequence = noteTransitioner.generate();
-  // make a markov that maps notes to durations
 }
 
 function parseTrackData(trackData, output) {
@@ -137,20 +130,22 @@ function parseTrackData(trackData, output) {
 
         output.channel[chan].velocities.push(trackData[i].velocity);
 
-        var deltaTime = deltaTimeToMeter(trackData[i].deltaTime);
         var deltaTimes = output.channel[chan].deltaTimes;
         var notes = output.channel[chan].notes;
         var chords = output.channel[chan].chords;
         var sequence = output.channel[chan].sequence;
 
+
+
         if (sequence.length > 3 && sequence[sequence.length - 1].noteOn - sequence[sequence.length - 2].noteOn !== 0) {
           var v = 2;
           var chord = [];
- 
+          var timeBetweenNotes = sequence[sequence.length - 1].noteOn - sequence[sequence.length - 2].noteOn;
+          deltaTimes.push(timeBetweenNotes);
+
           while (sequence.length > v && sequence[sequence.length - v].noteOn - sequence[sequence.length - v - 1].noteOn === 0) {
             chord.push(notes[notes.length - v]);
             v++;
-            // chords.push([ notes[notes.length - v - 1], notes[notes.length - 1] ]);
           }
           if (typeof (notes[notes.length - v]) !== 'undefined'){
             chord.push(notes[notes.length - v]);
@@ -161,7 +156,7 @@ function parseTrackData(trackData, output) {
           }
         }
 
-        deltaTimes.push(deltaTime);
+
         notes.push(note);
 
         sequence.push( {
@@ -173,6 +168,9 @@ function parseTrackData(trackData, output) {
     }
 
   }
+
+  delete midiFile;
+  console.log('whatsup');
 }
 
 /*
