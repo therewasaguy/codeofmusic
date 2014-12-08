@@ -34,7 +34,8 @@ var colorPos = 0;
 var sliderWidth, sliderHeight;
 var transportHeight = 150;
 var leftBarWidth = 200;
-var numSliders = 3;
+
+var boxCount = 2;
 var sliderContainerWidth;
 var sliderSnapValue = 8;
 
@@ -50,8 +51,8 @@ var sliderSketch = function(sketch) {
   var alphaValue = 0;
   // assign color scheme
   sketch.colorScheme = colorSchemes[colorRotation[colorPos % colorRotation.length]];
-  sketch.colorScheme2 = colorSchemes[colorRotation[colorPos - 1 % colorRotation.length]]
-  sketch.colorScheme3 = colorSchemes[colorRotation[colorPos - 2 % colorRotation.length]]
+  // sketch.colorScheme2 = colorSchemes[colorRotation[colorPos - 1 % colorRotation.length]]
+  // sketch.colorScheme3 = colorSchemes[colorRotation[colorPos - 2 % colorRotation.length]]
   colorPos++;
 
   sketch.setup = function() {
@@ -61,6 +62,7 @@ var sliderSketch = function(sketch) {
     sketch.noStroke();
 
     sketch.setupMouseInteraction();
+    sketch.resetPosition();
   }
 
   sketch.draw = function() {
@@ -73,9 +75,9 @@ var sliderSketch = function(sketch) {
     }
 
     // values
-    sketch.volume = sketch.slideBoxes[2].val;
-    // sketch.rect(0, sketch.height, sketch.width, slidePos);
-    // sketch.volume = sketch.map(slidePos + sketch.height, sketch.height, 0.0, 0.0, 1.0);
+    sketch.volume = sketch.slideBoxes[1].val;
+    // sketch.speed = sketch.slideBoxes[1].val;
+    // sketch.nNumber = sketch.slideBoxes[0].val;
 
     sketch.drawCursor();
     sketch.drawNotes();
@@ -84,7 +86,7 @@ var sliderSketch = function(sketch) {
 
   sketch.drawCursor = function() {
     sketch.stroke(255,255,0);
-    var relTime = timeElapsed % sketch.sumOfDeltaTimes;
+    var relTime = (timeElapsed - sketch.regenTime) % sketch.sumOfDeltaTimes;
     var x = sketch.map(relTime, 0, sketch.sumOfDeltaTimes, sliderContainerWidth, sketch.width);
     sketch.line(x, 0, x, sketch.height);
   }
@@ -100,11 +102,11 @@ var sliderSketch = function(sketch) {
       var duration = sketch.sequence.durations[i];
       var x = sketch.map(elTime, 0, sketch.sumOfDeltaTimes, sliderContainerWidth, sketch.width);
       var w = sketch.map(elTime + duration, 0, sketch.sumOfDeltaTimes, sliderContainerWidth, sketch.width);
-      var y = sketch.map(note, sketch.minNote, sketch.maxNote, 0, sketch.height);
+      var y = sketch.map(note, sketch.maxNote, sketch.minNote, 0, sketch.height);
       var h = sketch.height / 52;
       sketch.noStroke();
       sketch.fill(sketch.colorScheme[1]);
-      sketch.rect(x, y, w, h);
+      sketch.rect(x, y, 2, h);
     }
   }
 
@@ -117,9 +119,13 @@ var sliderSketch = function(sketch) {
       dragging = false;
       for (var i in sketch.slideBoxes) {
         if (sketch.slideBoxes[i].dragging) {
-          var magicNum = sketch.slideBoxes[i].val * sliderSnapValue;
+          var magicNum = sketch.slideBoxes[i].val * sliderSnapValue - 1;
           sketch.slideBoxes[i].val = Math.round(magicNum) / sliderSnapValue;
           sketch.slideBoxes[i].dragging = false;
+          if (i == 0) {
+            sketch.generateNewSequence(sketch.slideBoxes[0].val);
+          }
+          break;
         }
       }
     }
@@ -129,6 +135,7 @@ var sliderSketch = function(sketch) {
         for (var i in sketch.slideBoxes) {
           if (sketch.slideBoxes[i].mouseTouching() ) {
             sketch.slideBoxes[i].dragging = true;
+            break;
           }
         }
       }
@@ -136,7 +143,15 @@ var sliderSketch = function(sketch) {
     sketch.cnv.canvas.onmouseleave = function() {
       sketch.cnv.canvas.onmouseup();
       for (var i in sketch.slideBoxes) {
-        sketch.slideBoxes[i].dragging = false;
+        if (sketch.slideBoxes[i].dragging) {
+          var magicNum = sketch.slideBoxes[i].val * sliderSnapValue - 1;
+          sketch.slideBoxes[i].val = Math.round(magicNum) / sliderSnapValue;
+          sketch.slideBoxes[i].dragging = false;
+          if (i == 0) {
+            sketch.generateNewSequence(sketch.slideBoxes[0].val);
+          }
+          break;
+        }
       }
     }
   }
@@ -165,13 +180,12 @@ var sliderSketch = function(sketch) {
     sketch.rect(this.x, this.y, this.width, this.height);
     sketch.noStroke();
     sketch.fill(this.fillColor);
-    sketch.rect(this.x - fillPad, this.y + this.height - fillPad, this.width - fillPad, - this.height * this.val + fillPad);
+    sketch.rect(this.x + fillPad, this.y + this.height + fillPad, this.width - fillPad, - this.height * this.val + fillPad);
   }
 
   SlideBox.prototype.mouseTouching = function() {
-    if (sketch.mouseY > this.y && sketch.mouseY < this.y + this.height) {
+    if (sketch.mouseX > this.x && sketch.mouseX < this.x + this.width) {
       this.val = sketch.map(sketch.mouseY, this.y + this.height, this.y, 0.0, 1.0);
-      console.log(this.val);
       return true;
     } else {
       return false;
@@ -179,8 +193,6 @@ var sliderSketch = function(sketch) {
   }
 
   sketch.slideBoxes = [];
-
-  var boxCount = 3;
 
   for ( var i = 0; i< boxCount; i++ ) {
     var fillColor = sketch.colorScheme[( (i + 2) % (sketch.colorScheme.length-2)) + 2];
@@ -231,7 +243,20 @@ var sliderSketch = function(sketch) {
       return Math.min.apply( Math, array );
   };
 
-  sketch.generateNewSequence = function() {
+  sketch.generateNewSequence = function(n) {
+    var max = Math.floor(Math.random() * 5) + 1;
+    var n = Math.floor(n * 10) + 1;
+    console.log(n, max); 
+    sketch.markovGens['durations'].reset(n, max);
+    sketch.markovGens['deltaTimes'].reset(n, max);
+    sketch.markovGens['velocities'].reset(n, max);
+    sketch.markovGens['notes'].reset(n, max);
+
+    sketch.markovGens['durations'].feed(channelData.durations);
+    sketch.markovGens['deltaTimes'].feed(channelData.deltaTimes);
+    sketch.markovGens['velocities'].feed(channelData.velocities);
+    sketch.markovGens['notes'].feed(channelData.notes);
+
     sketch.sequence.durations = sketch.markovGens['durations'].generate();
     sketch.sequence.deltaTimes = sketch.markovGens['deltaTimes'].generate();
     sketch.sequence.velocities = sketch.markovGens['velocities'].generate();
@@ -243,20 +268,25 @@ var sliderSketch = function(sketch) {
     for (var i in sketch.sequence.deltaTimes) {
       sketch.sumOfDeltaTimes += sketch.sequence.deltaTimes[i];
     }
-    if (sketch.sumOfDeltaTimes % 0.5 !== 0) {
-      sketch.sequence.deltaTimes.push(sketch.sumOfDeltaTimes % 0.5);
-    }
+    // if (sketch.sumOfDeltaTimes % 0.5 !== 0) {
+    //   sketch.sequence.deltaTimes.push(sketch.sumOfDeltaTimes % 0.5);
+    // }
 
-    sketch.minNote = Array.min(sketch.sequence.notes);
-    sketch.maxNote = Array.max(sketch.sequence.notes);
+    sketch.minNote = Array.min(sketch.sequence.notes) - 1;
+    sketch.maxNote = Array.max(sketch.sequence.notes) + 1;
 
+    // reset position
+    sketch.resetPosition();
   }
 
-  sketch.needlePos = 0;
-  sketch.beatsSinceLastNote = 0;
+  sketch.resetPosition = function() {
+    sketch.needlePos = 0;
+    sketch.beatsSinceLastNote = 0;
+    sketch.regenTime = timeElapsed;
+  }
 
   sketch.lightUp = function() {
-    alphaValue = 1.0;
+    alphaValue = 1.0 * sketch.volume;
   }
 
 
@@ -267,8 +297,6 @@ var sliderSketch = function(sketch) {
 var programChanges = [];
 
 function createChannels(midiInfo) {
-  // sliderWidth = (window.innerWidth- leftBarWidth) / Object.keys(output.header.voices).length ;
-  // sliderHeight = window.innerHeight - transportHeight;
   sliderWidth = window.innerWidth - leftBarWidth;
   sliderHeight = (window.innerHeight + transportHeight) / Object.keys(output.header.voices).length;
   var sliderHeightOffset = 0;
