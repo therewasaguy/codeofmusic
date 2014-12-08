@@ -11,11 +11,15 @@ window.onload = function() {
 function startMidiJS() {
   MIDI.loadPlugin({
       soundfontUrl: "../lib/MIDI.js/soundfont/",
-      instruments: ["electric_piano_1", "fretless_bass", "voice_oohs", "synth_strings_1", "electric_guitar_muted", "string_ensemble_2"],
+
+      // instruments: ["electric_piano_1", "fretless_bass", "voice_oohs", "synth_strings_1", "electric_guitar_muted", "string_ensemble_2"],
+
       callback: function() {
-        for (var i in programChanges) {
-          MIDI.programChange(programChanges[i][0], programChanges[i][1]);
-        }
+
+        // for (var i in programChanges) {
+        //   MIDI.programChange(programChanges[i][0], programChanges[i][1]);
+        // }
+
         initTone();
         console.log('midi loaded!');
       }
@@ -39,6 +43,7 @@ function loadDrumChannel() {
   console.log('drums loaded!');
 }
 
+var timeElapsed = 0;
 function playNext() {
   var oneIncrement = 1/ parseInt(clockInterval) * 4;
 
@@ -53,23 +58,27 @@ function playNext() {
       nextBeat = Tone.Transport.transportTimeToSeconds(stringSinceLastBeat);
       var note = seq.notes[pos % seq.notes.length];
       var velocity = seq.velocities[pos % seq.velocities.length] * output.sketches[i].volume;
-      var duration = seq.durations[pos % seq.durations.length];
+      var duration = seq.durations[pos % seq.notes.length % seq.durations.length];
 
       if (i === '9') {
+        drumPlayers[note].setVolume(drumPlayers[note].gainToDb(output.sketches[i].volume));
         drumPlayers[note].start(0);
-        console.log(note);
       } else {
         MIDI.noteOn(i, note, velocity, Math.abs(nextBeat));
         MIDI.noteOff(i, note, duration + Math.abs(nextBeat));
       }
+
+      thisSketch.lightUp(duration);
       // increment position
       thisSketch.needlePos++;
 
       // reset beatsSinceLastNote
       thisSketch.beatsSinceLastNote = 0;
+
     }
   }
 
+  timeElapsed += oneIncrement;
 }
 
 function regenerateSequence() {
